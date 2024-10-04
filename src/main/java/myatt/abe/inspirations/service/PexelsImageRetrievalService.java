@@ -1,7 +1,7 @@
 package myatt.abe.inspirations.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import myatt.abe.inspirations.clients.PexelClient;
+import myatt.abe.inspirations.client.PexelClient;
 import myatt.abe.inspirations.model.pexels.PexelCuratedResponse;
 import myatt.abe.inspirations.model.pexels.PexelImageData;
 import myatt.abe.inspirations.model.pexels.PexelPhoto;
@@ -10,14 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 public class PexelsImageRetrievalService {

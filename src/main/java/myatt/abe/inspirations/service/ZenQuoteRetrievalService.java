@@ -1,7 +1,7 @@
 package myatt.abe.inspirations.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import myatt.abe.inspirations.clients.ZenQuoteClient;
+import myatt.abe.inspirations.client.ZenQuoteClient;
 import myatt.abe.inspirations.model.zenquotes.ZenQuoteResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

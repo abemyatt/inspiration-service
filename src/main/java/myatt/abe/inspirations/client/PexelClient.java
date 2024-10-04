@@ -1,4 +1,4 @@
-package myatt.abe.inspirations.clients;
+package myatt.abe.inspirations.client;
 
 import java.io.IOException;
 import java.net.URI;
