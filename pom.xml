@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>inspiration-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>unversioned</version>
 	<name>inspiration-service</name>
 	<description>A beautiful service giving you inspiration</description>
 	<properties>

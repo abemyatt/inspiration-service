@@ -14,3 +14,18 @@ Isn't that right guys?
 ## Purpose of service
 End goal is to grab a random quote, grab a random image, smush the quote on the image, voila. So inspiring.
 
+## Building and Running the service
+Ensure all listed environment variables are set before build/run of the service.
+
+### Using local
+
+1. Run `make build` to package the service into a JAR file.
+2. Run `./start.sh` to run the program.
+
+### Using Docker
+The Dockerfile uses a multi-stage build. It will build the project within the container before copying the necessary files into the final image.
+
+1. Run `docker build --tag inspiration-service .`
+2. Run `docker run --interactive --tty -p 8080:8080 --env ZEN_QUOTES_URL --env PEXELS_URL --env PEXELS_API_KEY --env SPRING_PROFILES_ACTIVE=test inspiration-service`
+
+The service should now be accessible in localhost on port 8080.
