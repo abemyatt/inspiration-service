@@ -1,8 +1,8 @@
 package myatt.abe.inspirations.controller;
 
-import myatt.abe.inspirations.service.ImageSavingService;
+import myatt.abe.inspirations.service.FileReadWriteService;
 import myatt.abe.inspirations.service.PexelsImageRetrievalService;
-import myatt.abe.inspirations.service.TextOnGraphicsService;
+import myatt.abe.inspirations.service.ImageModifierService;
 import myatt.abe.inspirations.service.ZenQuoteRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -27,10 +27,10 @@ public class TestController {
     private PexelsImageRetrievalService pexelsImageRetrievalService;
 
     @Autowired
-    private ImageSavingService imageSavingService;
+    private FileReadWriteService fileReadWriteService;
 
     @Autowired
-    private TextOnGraphicsService textOnGraphicsService;
+    private ImageModifierService imageModifierService;
 
     @GetMapping("/zen-quote")
     public ResponseEntity<String> getZenQuote() throws URISyntaxException, IOException, InterruptedException {
@@ -45,7 +45,7 @@ public class TestController {
 
         var imageBytes = pexelsImageRetrievalService.downloadImage(pexelImage);
 
-        imageSavingService.saveImage(imageBytes);
+        fileReadWriteService.savePexelImage(imageBytes);
 
         return new ResponseEntity<>(pexelImage.toString(), HttpStatus.OK);
     }
@@ -56,7 +56,7 @@ public class TestController {
 
         var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 
-        imageSavingService.saveImage(pexelImageData);
+        fileReadWriteService.savePexelImage(pexelImageData);
 
         return new ResponseEntity<>(pexelImage.toString(), HttpStatus.OK);
     }
@@ -69,9 +69,13 @@ public class TestController {
 
         var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 
-        imageSavingService.saveImage(pexelImageData);
+        fileReadWriteService.savePexelImage(pexelImageData);
 
-        textOnGraphicsService.addTextToImage(pexelImageData.getTimestamp(), zenQuote);
+        var timestamp = pexelImageData.getTimestamp();
+
+        var bufferedImage = imageModifierService.addTextToImage(timestamp, zenQuote);
+
+        fileReadWriteService.saveBufferedImage(timestamp, bufferedImage);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -84,9 +88,13 @@ public class TestController {
 
         var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 
-        imageSavingService.saveImage(pexelImageData);
+        fileReadWriteService.savePexelImage(pexelImageData);
 
-        textOnGraphicsService.addTextToImage(pexelImageData.getTimestamp(), zenQuote);
+        var timestamp = pexelImageData.getTimestamp();
+
+        var bufferedImage = imageModifierService.addTextToImage(timestamp, zenQuote);
+
+        fileReadWriteService.saveBufferedImage(timestamp, bufferedImage);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

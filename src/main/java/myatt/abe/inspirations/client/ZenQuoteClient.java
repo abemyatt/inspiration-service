@@ -7,6 +7,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static myatt.abe.inspirations.utility.Constants.ACCEPT_HEADER;
+import static myatt.abe.inspirations.utility.Constants.APPLICATION_JSON;
+
 public class ZenQuoteClient {
 
     private static final String RANDOM_PATH = "/random";
@@ -22,7 +25,7 @@ public class ZenQuoteClient {
     public HttpResponse<String> getRandomZenQuote() throws IOException, InterruptedException, URISyntaxException {
         var request = HttpRequest.newBuilder()
                 .uri(new URI(url + RANDOM_PATH))
-                .header("Accept", "application/json")
+                .header(ACCEPT_HEADER, APPLICATION_JSON)
                 .GET()
                 .build();
 

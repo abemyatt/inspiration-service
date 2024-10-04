@@ -3,28 +3,37 @@ package myatt.abe.inspirations.service;
 import myatt.abe.inspirations.model.pexels.PexelImageData;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@Service
-public class ImageSavingService {
+import static myatt.abe.inspirations.utility.Constants.FILE_BASE_PATH;
+import static myatt.abe.inspirations.utility.Constants.JPEG_FILE_EXTENSION;
 
-    public void saveImage(PexelImageData pexelImageData) {
+@Service
+public class FileReadWriteService {
+
+    public void savePexelImage(PexelImageData pexelImageData) {
 
         var imageAsBytes = pexelImageData.getImageAsBytes();
         var timestamp = pexelImageData.getTimestamp();
 
         var file = createFile(timestamp);
 
-        saveImageToFile(imageAsBytes, file);
+        saveImageBytesToFile(imageAsBytes, file);
+    }
+
+    public void saveBufferedImage(String timestamp, BufferedImage bufferedImage) throws IOException {
+        var modifiedFilePath = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
+        ImageIO.write(bufferedImage, "jpeg", new File(modifiedFilePath));
     }
 
     private File createFile(String timestamp) {
-        var currentWorkingDirectory = System.getProperty("user.dir");
-        var fileDestination = currentWorkingDirectory + File.separator + "images" + File.separator + timestamp + ".jpeg";
-        var file = new File(fileDestination);
+        var fullFilePath = FILE_BASE_PATH + timestamp + ".jpeg";
+        var file = new File(fullFilePath);
 
         try {
             file.createNewFile();
@@ -35,7 +44,7 @@ public class ImageSavingService {
         }
     }
 
-    private void saveImageToFile(byte[] imageAsBytes, File file) {
+    private void saveImageBytesToFile(byte[] imageAsBytes, File file) {
         var byteArrayInputStream = new ByteArrayInputStream(imageAsBytes);
         try (var outputStream = new FileOutputStream(file)) {
             outputStream.write(byteArrayInputStream.readAllBytes());

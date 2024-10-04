@@ -7,6 +7,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static myatt.abe.inspirations.utility.Constants.ACCEPT_HEADER;
+import static myatt.abe.inspirations.utility.Constants.APPLICATION_JSON;
+import static myatt.abe.inspirations.utility.Constants.AUTHORIZATION_HEADER;
+import static myatt.abe.inspirations.utility.Constants.CONTENT_TYPE_HEADER;
+import static myatt.abe.inspirations.utility.Constants.IMAGE_JPEG;
+
 public class PexelClient {
 
     private static final String CURATED_PATH = "/curated";
@@ -14,12 +20,6 @@ public class PexelClient {
     private static final String SEARCH_PATH = "/search";
 
     private static final String SEARCH_QUERY = "?query=lion&per_page=1";
-
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String ACCEPT_HEADER = "Accept";
-    private static final String APPLICATION_JSON = "application/json";
-    private static final String IMAGE_JPEG = "image/jpeg";
 
     private final HttpClient httpClient;
     private final String apiKey;
