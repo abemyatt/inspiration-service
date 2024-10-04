@@ -2,6 +2,7 @@ package myatt.abe.inspirations.controller;
 
 import myatt.abe.inspirations.service.ImageSavingService;
 import myatt.abe.inspirations.service.PexelsImageRetrievalService;
+import myatt.abe.inspirations.service.TextOnGraphicsService;
 import myatt.abe.inspirations.service.ZenQuoteRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -28,9 +29,12 @@ public class TestController {
     @Autowired
     private ImageSavingService imageSavingService;
 
+    @Autowired
+    private TextOnGraphicsService textOnGraphicsService;
+
     @GetMapping("/zen-quote")
     public ResponseEntity<String> getZenQuote() throws URISyntaxException, IOException, InterruptedException {
-        var zenQuote = zenQuoteRetrievalService.sendRequest();
+        var zenQuote = zenQuoteRetrievalService.getRandomQuote();
 
         return new ResponseEntity<>(zenQuote.toString(), HttpStatus.OK);
     }
@@ -50,10 +54,40 @@ public class TestController {
     public ResponseEntity<String> getPexelsSearchImage() throws URISyntaxException, IOException, InterruptedException {
         var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos();
 
-        var imageBytes = pexelsImageRetrievalService.downloadImage(pexelImage);
+        var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 
-        imageSavingService.saveImage(imageBytes);
+        imageSavingService.saveImage(pexelImageData);
 
         return new ResponseEntity<>(pexelImage.toString(), HttpStatus.OK);
+    }
+
+    @GetMapping("/add-text-to-image-curated")
+    public ResponseEntity<String> addTextToImageCurated() throws IOException, URISyntaxException, InterruptedException {
+        var zenQuote = zenQuoteRetrievalService.getRandomQuote();
+
+        var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+
+        var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+
+        imageSavingService.saveImage(pexelImageData);
+
+        textOnGraphicsService.addTextToImage(pexelImageData.getTimestamp(), zenQuote);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/add-text-to-image-search")
+    public ResponseEntity<String> addTextToImageSearch() throws IOException, URISyntaxException, InterruptedException {
+        var zenQuote = zenQuoteRetrievalService.getRandomQuote();
+
+        var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos();
+
+        var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+
+        imageSavingService.saveImage(pexelImageData);
+
+        textOnGraphicsService.addTextToImage(pexelImageData.getTimestamp(), zenQuote);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

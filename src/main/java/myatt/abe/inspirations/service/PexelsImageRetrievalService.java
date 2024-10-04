@@ -57,6 +57,6 @@ public class PexelsImageRetrievalService {
 
         var imageData = pexelClient.getPhoto(url).body();
 
-        return new PexelImageData(pexelPhoto.getWidth(), pexelPhoto.getHeight(), imageData);
+        return new PexelImageData(imageData);
     }
 }

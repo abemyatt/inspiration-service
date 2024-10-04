@@ -22,7 +22,7 @@ public class ZenQuoteRetrievalService {
     @Value("${zen.quotes.url}")
     private String zenQuotesUrl;
 
-    public ZenQuoteResponse sendRequest() throws URISyntaxException, IOException, InterruptedException {
+    public ZenQuoteResponse getRandomQuote() throws URISyntaxException, IOException, InterruptedException {
 
         var response = zenQuoteClient.getRandomZenQuote();
 

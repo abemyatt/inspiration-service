@@ -1,40 +1,23 @@
 package myatt.abe.inspirations.model.pexels;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class PexelImageData {
+    private final byte[] imageAsBytes;
 
-    private int width;
+    private final String timestamp;
 
-    private int height;
-
-    private byte[] imageAsBytes;
-
-    public PexelImageData(int width, int height, byte[] imageAsBytes) {
-        this.width = width;
-        this.height = height;
+    public PexelImageData(byte[] imageAsBytes) {
         this.imageAsBytes = imageAsBytes;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));
     }
 
     public byte[] getImageAsBytes() {
         return imageAsBytes;
     }
 
-    public void setImageAsBytes(byte[] imageAsBytes) {
-        this.imageAsBytes = imageAsBytes;
+    public String getTimestamp() {
+        return timestamp;
     }
 }
