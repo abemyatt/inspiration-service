@@ -1,0 +1,14 @@
+target
+
+README.md
+
+.mvn
+mvnw*
+
+.idea
+
+.dockerignore
+Dockerfile
+
+.git
+.gitignore
