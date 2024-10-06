@@ -20,14 +20,14 @@ public class ModifiedImageProperties {
         this.imageHeight = imageHeight;
         this.stringWidth = stringWidth;
         this.stringXPosition = (imageWidth / 2) - (stringWidth / 2);
-        this.stringYPosition = imageHeight - (imageHeight / 8);
-        this.authorYOffset = imageHeight / 12;
+        this.stringYPosition = (int) (imageHeight - (imageHeight * 0.5));
+        this.authorYOffset = (int) (stringYPosition - (stringYPosition * 0.90));
         this.transparentBoxXPadding = (int) Math.floor(imageWidth * 0.02);
-        this.transparentBoxYPadding = (int) Math.floor (imageHeight * 0.02);
+        this.transparentBoxYPadding = (int) Math.floor (imageHeight * 0.05);
         this.transparentBoxXPosition = this.stringXPosition - this.transparentBoxXPadding;
-        this.transparentBoxYPosition = this.stringYPosition - (this.transparentBoxYPadding * 2);
+        this.transparentBoxYPosition = stringYPosition - authorYOffset;
         this.transparentBoxWidth = stringWidth + (transparentBoxXPadding * 2);
-        this.transparentBoxHeight = stringYPosition + (transparentBoxYPadding * 2);
+        this.transparentBoxHeight = authorYOffset + (transparentBoxYPadding * 2);
     }
 
     public int getImageWidth() {

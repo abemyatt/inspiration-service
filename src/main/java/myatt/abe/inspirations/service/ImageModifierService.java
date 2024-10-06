@@ -24,18 +24,20 @@ public class ImageModifierService {
 
     public BufferedImage addTextToImage(String timestamp, ZenQuoteResponse zenQuoteResponse) throws IOException {
         var quote = zenQuoteResponse.getQuote();
-        var author = zenQuoteResponse.getAuthorName();
+        var author = "- " + zenQuoteResponse.getAuthorName();
 
         var file = new File(FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION);
 
         var bufferedImage = ImageIO.read(file);
         var height = bufferedImage.getHeight();
         var width = bufferedImage.getWidth();
-        var calculatedFontSize = (int) Math.floor(width * 0.018);
+        var calculatedFontSize = (int) Math.floor(width * 0.019);
 
         Graphics g = bufferedImage.getGraphics();
         Font font = new Font(chooseFont(), chooseStyle(), calculatedFontSize);
         g.setFont(font);
+
+        //TODO: Calculate string width compared to image width, split into string 'chunks'
         var stringWidth = g.getFontMetrics().stringWidth(quote);
 
         var modifiedImageProperties = new ModifiedImageProperties(width, height, stringWidth);
@@ -51,9 +53,8 @@ public class ImageModifierService {
         stringWidth = g.getFontMetrics().stringWidth(author);
         modifiedImageProperties = new ModifiedImageProperties(width, height, stringWidth);
 
-        var authorYOffset = height / 12;
         g.drawString(author, modifiedImageProperties.getStringXPosition(),
-                modifiedImageProperties.getStringYPosition() + authorYOffset);
+                modifiedImageProperties.getStringYPosition() + modifiedImageProperties.getAuthorYOffset());
 
         g.dispose();
 
