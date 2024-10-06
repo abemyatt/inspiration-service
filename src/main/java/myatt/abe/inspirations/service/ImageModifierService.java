@@ -1,5 +1,6 @@
 package myatt.abe.inspirations.service;
 
+import myatt.abe.inspirations.model.ModifiedImageProperties;
 import myatt.abe.inspirations.model.zenquotes.ZenQuoteResponse;
 import org.springframework.stereotype.Service;
 
@@ -36,21 +37,23 @@ public class ImageModifierService {
         Font font = new Font(chooseFont(), chooseStyle(), calculatedFontSize);
         g.setFont(font);
         var stringWidth = g.getFontMetrics().stringWidth(quote);
-        var stringXPosition = (width / 2) - (stringWidth / 2);
-        var stringYPosition = height - (height / 8);
-        var authorYOffset = height / 12;
-        var transparentBoxXPadding = (int) Math.floor(width * 0.02);
-        var transparentBoxYPadding = (int) Math.floor (height * 0.02);
+
+        var modifiedImageProperties = new ModifiedImageProperties(width, height, stringWidth);
+
         int alpha = 180;
         Color color = new Color(0, 0, 0, alpha);
         g.setColor(color);
-        g.fillRect(stringXPosition - transparentBoxXPadding, stringYPosition - transparentBoxYPadding, stringWidth + (transparentBoxXPadding * 2), stringYPosition + (transparentBoxYPadding * 2));
+        g.fillRect(modifiedImageProperties.getTransparentBoxXPosition(), modifiedImageProperties.getTransparentBoxYPosition(),
+                modifiedImageProperties.getTransparentBoxWidth(), modifiedImageProperties.getTransparentBoxHeight());
         g.setColor(new Color(255, 255, 255));
-        g.drawString(quote, stringXPosition, stringYPosition);
+        g.drawString(quote, modifiedImageProperties.getStringXPosition(), modifiedImageProperties.getStringYPosition());
 
         stringWidth = g.getFontMetrics().stringWidth(author);
-        stringXPosition = (width / 2) - (stringWidth / 2);
-        g.drawString(author, stringXPosition, stringYPosition + authorYOffset);
+        modifiedImageProperties = new ModifiedImageProperties(width, height, stringWidth);
+
+        var authorYOffset = height / 12;
+        g.drawString(author, modifiedImageProperties.getStringXPosition(),
+                modifiedImageProperties.getStringYPosition() + authorYOffset);
 
         g.dispose();
 
