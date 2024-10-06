@@ -44,7 +44,7 @@ public class ImageModifierService {
         int alpha = 180;
         Color color = new Color(0, 0, 0, alpha);
         g.setColor(color);
-        g.fillRect(stringXPosition - transparentBoxXPadding, stringYPosition - transparentBoxYPadding, stringWidth + transparentBoxXPadding, stringYPosition + transparentBoxYPadding);
+        g.fillRect(stringXPosition - transparentBoxXPadding, stringYPosition - transparentBoxYPadding, stringWidth + (transparentBoxXPadding * 2), stringYPosition + (transparentBoxYPadding * 2));
         g.setColor(new Color(255, 255, 255));
         g.drawString(quote, stringXPosition, stringYPosition);
 
