@@ -1,8 +1,8 @@
 package myatt.abe.inspirations.controller;
 
 import myatt.abe.inspirations.service.FileReadWriteService;
-import myatt.abe.inspirations.service.PexelsImageRetrievalService;
 import myatt.abe.inspirations.service.ImageModifierService;
+import myatt.abe.inspirations.service.PexelsImageRetrievalService;
 import myatt.abe.inspirations.service.ZenQuoteRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -51,8 +52,8 @@ public class TestController {
     }
 
     @GetMapping("/pexels-search")
-    public ResponseEntity<String> getPexelsSearchImage() throws URISyntaxException, IOException, InterruptedException {
-        var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos();
+    public ResponseEntity<String> getPexelsSearchImage(@RequestParam String query) throws URISyntaxException, IOException, InterruptedException {
+        var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos(query);
 
         var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 
@@ -81,10 +82,10 @@ public class TestController {
     }
 
     @GetMapping("/add-text-to-image-search")
-    public ResponseEntity<String> addTextToImageSearch() throws IOException, URISyntaxException, InterruptedException {
+    public ResponseEntity<String> addTextToImageSearch(@RequestParam(name = "query") String query) throws IOException, URISyntaxException, InterruptedException {
         var zenQuote = zenQuoteRetrievalService.getRandomQuote();
 
-        var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos();
+        var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos(query);
 
         var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 

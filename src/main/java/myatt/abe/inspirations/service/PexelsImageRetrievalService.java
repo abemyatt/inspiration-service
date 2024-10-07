@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class PexelsImageRetrievalService {
@@ -36,13 +37,15 @@ public class PexelsImageRetrievalService {
         return photos.getPhotos()[0]; // return the first photo
     }
 
-    public PexelPhoto retrieveSearchPhotos() throws IOException, InterruptedException, URISyntaxException {
+    public PexelPhoto retrieveSearchPhotos(String query) throws IOException, InterruptedException, URISyntaxException {
 
-        var responseBody = pexelClient.getSearchImage().body();
+        var responseBody = pexelClient.getSearchImage(query).body();
 
         var photos = objectMapper.readValue(responseBody, PexelSearchResponse.class);
 
-        return photos.getPhotos()[0]; // return the first photo
+        var randomPhotoIndex = ThreadLocalRandom.current().nextInt(photos.getPhotos().length - 1);
+
+        return photos.getPhotos()[randomPhotoIndex]; // return the first photo
     }
 
     public PexelImageData downloadImage(PexelPhoto pexelPhoto) throws IOException, URISyntaxException, InterruptedException {

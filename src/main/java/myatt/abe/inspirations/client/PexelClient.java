@@ -19,7 +19,7 @@ public class PexelClient {
 
     private static final String SEARCH_PATH = "/search";
 
-    private static final String SEARCH_QUERY = "?query=lion&per_page=1";
+    private static final String QUERY_PARAM = "?query=";
 
     private final HttpClient httpClient;
     private final String apiKey;
@@ -44,9 +44,9 @@ public class PexelClient {
         return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public HttpResponse<String> getSearchImage() throws URISyntaxException, IOException, InterruptedException {
+    public HttpResponse<String> getSearchImage(String query) throws URISyntaxException, IOException, InterruptedException {
         var request = HttpRequest.newBuilder()
-                .uri(new URI(url + SEARCH_PATH + SEARCH_QUERY))
+                .uri(new URI(url + SEARCH_PATH + QUERY_PARAM + query))
                 .header(AUTHORIZATION_HEADER, apiKey)
                 .header(CONTENT_TYPE_HEADER, APPLICATION_JSON)
                 .header(ACCEPT_HEADER, APPLICATION_JSON)
