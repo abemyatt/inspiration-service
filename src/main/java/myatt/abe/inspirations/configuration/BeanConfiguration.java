@@ -44,7 +44,8 @@ public class BeanConfiguration {
 
     @Bean
     public JDA jda() {
-        return JDABuilder.createLight(discordToken, EnumSet.noneOf(GatewayIntent.class))
+        return JDABuilder
+                .createLight(discordToken, EnumSet.noneOf(GatewayIntent.class))
                 .build();
     }
 

@@ -8,10 +8,12 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -27,6 +29,8 @@ import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_IMAGE_DESCR
 import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_QUOTE_COMMAND;
 import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_QUOTE_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.SEARCH_QUERY_OPTION;
+import static myatt.abe.inspirations.utility.Constants.FILE_BASE_PATH;
+import static myatt.abe.inspirations.utility.Constants.JPEG_FILE_EXTENSION;
 import static net.dv8tion.jda.api.interactions.commands.OptionType.STRING;
 
 @Component
@@ -81,11 +85,18 @@ public class CommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (event.getGuild() == null) return;
+        File file;
+        String searchQuery;
 
         switch (event.getName()) {
             case RANDOM_QUOTE_COMMAND:
+                var quote = "";
+                var author = "";
+                event.reply("Finding a quote...").queue();
                 try {
-                    event.reply(zenQuoteRetrievalService.getRandomQuote().getQuote()).queue();
+                    var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
+                    quote = zenQuoteResponse.getQuote();
+                    author = zenQuoteResponse.getAuthorName();
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
@@ -93,18 +104,89 @@ public class CommandListener extends ListenerAdapter {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                event.getChannel().sendMessage(quote + " - " + author).queue();
                 break;
             case RANDOM_IMAGE_COMMAND:
-                // event.reply("").addFiles(null).queue();
+                event.reply("Finding a random image...").queue();
+                try {
+                    var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+                    var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+                    var timestamp = pexelImageData.getTimestamp();
+                    var pathToFile = FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION;
+                    fileReadWriteService.savePexelImage(pexelImageData);
+                    file = new File(pathToFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
                 break;
             case INSPIRATIONAL_IMAGE_COMMAND:
-                // event.reply("").addFiles(null).queue();
+                event.reply("Creating something inspirational...").queue();
+                try {
+                    var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
+                    var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+                    var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+                    var timestamp = pexelImageData.getTimestamp();
+                    var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
+                    fileReadWriteService.savePexelImage(pexelImageData);
+                    var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
+                    fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
+                    file = new File(pathToFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
                 break;
 
             case IMAGE_SEARCH_COMMAND:
+                event.reply("Finding an image...").queue();
+                searchQuery = event.getOption(SEARCH_QUERY_OPTION).getAsString();
+                try {
+                    var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos(searchQuery);
+                    var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+                    var timestamp = pexelImageData.getTimestamp();
+                    var pathToFile = FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION;
+                    fileReadWriteService.savePexelImage(pexelImageData);
+                    file = new File(pathToFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
+
+                break;
             case INSPIRATIONAL_IMAGE_SEARCH_COMMAND:
-                var query = event.getOption(SEARCH_QUERY_OPTION);
-                // event.reply("").addFiles(null).queue();
+                searchQuery = event.getOption(SEARCH_QUERY_OPTION).getAsString();
+                event.reply("Creating something unique and inspirational...").queue();
+                try {
+                    var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
+                    var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos(searchQuery);
+                    var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+                    var timestamp = pexelImageData.getTimestamp();
+                    var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
+                    fileReadWriteService.savePexelImage(pexelImageData);
+                    var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
+                    fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
+                    file = new File(pathToFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
                 break;
             default:
                 event.reply("The definition of insanity is trying the same thing twice and expecting different results")
