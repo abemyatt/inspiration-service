@@ -87,6 +87,8 @@ public class CommandListener extends ListenerAdapter {
         if (event.getGuild() == null) return;
         File file;
         String searchQuery;
+        String timestamp;
+        var imagesCreated = false;
 
         switch (event.getName()) {
             case RANDOM_QUOTE_COMMAND:
@@ -111,9 +113,10 @@ public class CommandListener extends ListenerAdapter {
                 try {
                     var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
                     var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
-                    var timestamp = pexelImageData.getTimestamp();
+                    timestamp = pexelImageData.getTimestamp();
                     var pathToFile = FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION;
                     fileReadWriteService.savePexelImage(pexelImageData);
+                    imagesCreated = true;
                     file = new File(pathToFile);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -130,12 +133,13 @@ public class CommandListener extends ListenerAdapter {
                     var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
                     var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
                     var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
-                    var timestamp = pexelImageData.getTimestamp();
+                    timestamp = pexelImageData.getTimestamp();
                     var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
                     fileReadWriteService.savePexelImage(pexelImageData);
                     var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
                     fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
                     file = new File(pathToFile);
+                    imagesCreated = true;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (InterruptedException e) {
@@ -144,6 +148,7 @@ public class CommandListener extends ListenerAdapter {
                     throw new RuntimeException(e);
                 }
                 event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
+
                 break;
 
             case IMAGE_SEARCH_COMMAND:
@@ -152,9 +157,10 @@ public class CommandListener extends ListenerAdapter {
                 try {
                     var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos(searchQuery);
                     var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
-                    var timestamp = pexelImageData.getTimestamp();
+                    timestamp = pexelImageData.getTimestamp();
                     var pathToFile = FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION;
                     fileReadWriteService.savePexelImage(pexelImageData);
+                    imagesCreated = true;
                     file = new File(pathToFile);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -164,8 +170,8 @@ public class CommandListener extends ListenerAdapter {
                     throw new RuntimeException(e);
                 }
                 event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
-
                 break;
+
             case INSPIRATIONAL_IMAGE_SEARCH_COMMAND:
                 searchQuery = event.getOption(SEARCH_QUERY_OPTION).getAsString();
                 event.reply("Creating something unique and inspirational...").queue();
@@ -173,11 +179,12 @@ public class CommandListener extends ListenerAdapter {
                     var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
                     var pexelImage = pexelsImageRetrievalService.retrieveSearchPhotos(searchQuery);
                     var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
-                    var timestamp = pexelImageData.getTimestamp();
+                    timestamp = pexelImageData.getTimestamp();
                     var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
                     fileReadWriteService.savePexelImage(pexelImageData);
                     var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
                     fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
+                    imagesCreated = true;
                     file = new File(pathToFile);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -188,9 +195,23 @@ public class CommandListener extends ListenerAdapter {
                 }
                 event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
                 break;
+
             default:
                 event.reply("The definition of insanity is trying the same thing twice and expecting different results")
                         .queue();
+        }
+
+        if(imagesCreated) {
+            try {
+                Thread.sleep(5000); // wait for image to be sent before trying to delete
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                fileReadWriteService.deleteFilesInDirectory(new File(FILE_BASE_PATH));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

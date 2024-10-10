@@ -31,6 +31,14 @@ public class FileReadWriteService {
         ImageIO.write(bufferedImage, "jpeg", new File(modifiedFilePath));
     }
 
+    public void deleteFilesInDirectory(File directory) throws IOException {
+        for (File file: directory.listFiles()) {
+            if (file.isDirectory())
+                deleteFilesInDirectory(file);
+            file.delete();
+        }
+    }
+
     private File createFile(String timestamp) {
         var fullFilePath = FILE_BASE_PATH + timestamp + ".jpeg";
         var file = new File(fullFilePath);
