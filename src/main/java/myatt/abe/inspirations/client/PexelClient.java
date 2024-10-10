@@ -21,6 +21,8 @@ public class PexelClient {
 
     private static final String QUERY_PARAM = "?query=";
 
+    private static final String PER_PAGE_PARAM = "?per_page=";
+
     private final HttpClient httpClient;
     private final String apiKey;
 
@@ -34,7 +36,19 @@ public class PexelClient {
 
     public HttpResponse<String> getCuratedImage() throws URISyntaxException, IOException, InterruptedException {
         var request = HttpRequest.newBuilder()
-                .uri(new URI(url + CURATED_PATH))
+                .uri(new URI(url + CURATED_PATH + PER_PAGE_PARAM + "1"))
+                .header(AUTHORIZATION_HEADER, apiKey)
+                .header(CONTENT_TYPE_HEADER, APPLICATION_JSON)
+                .header(ACCEPT_HEADER, APPLICATION_JSON)
+                .GET()
+                .build();
+
+        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public HttpResponse<String> getRandomImage() throws URISyntaxException, IOException, InterruptedException {
+        var request = HttpRequest.newBuilder()
+                .uri(new URI(url + CURATED_PATH + PER_PAGE_PARAM + "80"))
                 .header(AUTHORIZATION_HEADER, apiKey)
                 .header(CONTENT_TYPE_HEADER, APPLICATION_JSON)
                 .header(ACCEPT_HEADER, APPLICATION_JSON)

@@ -29,12 +29,22 @@ public class PexelsImageRetrievalService {
     @Value("${pexels.api.key}")
     private String pexelsApiKey;
 
-    public PexelPhoto retrieveCuratedPhotos() throws IOException, InterruptedException, URISyntaxException {
+    public PexelPhoto retrieveCuratedPhoto() throws IOException, InterruptedException, URISyntaxException {
         var responseBody = pexelClient.getCuratedImage().body();
 
         var photos = objectMapper.readValue(responseBody, PexelCuratedResponse.class);
 
         return photos.getPhotos()[0]; // return the first photo
+    }
+
+    public PexelPhoto retrieveRandomPhoto() throws IOException, InterruptedException, URISyntaxException {
+        var responseBody = pexelClient.getRandomImage().body();
+
+        var photos = objectMapper.readValue(responseBody, PexelCuratedResponse.class);
+
+        var randomPhotoIndex = ThreadLocalRandom.current().nextInt(photos.getPhotos().length - 1);
+
+        return photos.getPhotos()[randomPhotoIndex]; // return the first photo
     }
 
     public PexelPhoto retrieveSearchPhotos(String query) throws IOException, InterruptedException, URISyntaxException {

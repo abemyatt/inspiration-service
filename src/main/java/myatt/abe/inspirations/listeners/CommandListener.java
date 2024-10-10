@@ -17,15 +17,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import static myatt.abe.inspirations.utility.CommandConstants.CURATED_IMAGE_COMMAND;
+import static myatt.abe.inspirations.utility.CommandConstants.CURATED_IMAGE_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.IMAGE_SEARCH_COMMAND;
 import static myatt.abe.inspirations.utility.CommandConstants.IMAGE_SEARCH_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.IMAGE_SEARCH_QUERY_DESCRIPTION;
-import static myatt.abe.inspirations.utility.CommandConstants.INSPIRATIONAL_IMAGE_COMMAND;
-import static myatt.abe.inspirations.utility.CommandConstants.INSPIRATIONAL_IMAGE_DESCRIPTION;
+import static myatt.abe.inspirations.utility.CommandConstants.CURATED_INSPIRATION_COMMAND;
+import static myatt.abe.inspirations.utility.CommandConstants.CURATED_INSPIRATION_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.INSPIRATIONAL_IMAGE_SEARCH_COMMAND;
 import static myatt.abe.inspirations.utility.CommandConstants.INSPIRATIONAL_IMAGE_SEARCH_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_IMAGE_COMMAND;
 import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_IMAGE_DESCRIPTION;
+import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_INSPIRATION_COMMAND;
+import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_INSPIRATION_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_QUOTE_COMMAND;
 import static myatt.abe.inspirations.utility.CommandConstants.RANDOM_QUOTE_DESCRIPTION;
 import static myatt.abe.inspirations.utility.CommandConstants.SEARCH_QUERY_OPTION;
@@ -65,12 +69,20 @@ public class CommandListener extends ListenerAdapter {
         );
 
         commandListUpdateAction.addCommands(
-                Commands.slash(INSPIRATIONAL_IMAGE_COMMAND, INSPIRATIONAL_IMAGE_DESCRIPTION)
+                Commands.slash(CURATED_IMAGE_COMMAND, CURATED_IMAGE_DESCRIPTION)
         );
 
         commandListUpdateAction.addCommands(
                 Commands.slash(IMAGE_SEARCH_COMMAND, IMAGE_SEARCH_DESCRIPTION)
                         .addOption(STRING, SEARCH_QUERY_OPTION, IMAGE_SEARCH_QUERY_DESCRIPTION, true)
+        );
+
+        commandListUpdateAction.addCommands(
+                Commands.slash(CURATED_INSPIRATION_COMMAND, CURATED_INSPIRATION_DESCRIPTION)
+        );
+
+        commandListUpdateAction.addCommands(
+                Commands.slash(RANDOM_INSPIRATION_COMMAND, RANDOM_INSPIRATION_DESCRIPTION)
         );
 
         commandListUpdateAction.addCommands(
@@ -108,10 +120,11 @@ public class CommandListener extends ListenerAdapter {
                 }
                 event.getChannel().sendMessage(quote + " - " + author).queue();
                 break;
+
             case RANDOM_IMAGE_COMMAND:
                 event.reply("Finding a random image...").queue();
                 try {
-                    var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+                    var pexelImage = pexelsImageRetrievalService.retrieveRandomPhoto();
                     var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
                     timestamp = pexelImageData.getTimestamp();
                     var pathToFile = FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION;
@@ -127,19 +140,17 @@ public class CommandListener extends ListenerAdapter {
                 }
                 event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
                 break;
-            case INSPIRATIONAL_IMAGE_COMMAND:
-                event.reply("Creating something inspirational...").queue();
+
+            case CURATED_IMAGE_COMMAND:
+                event.reply("Finding the current curated image...").queue();
                 try {
-                    var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
-                    var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+                    var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhoto();
                     var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
                     timestamp = pexelImageData.getTimestamp();
-                    var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
+                    var pathToFile = FILE_BASE_PATH + timestamp + JPEG_FILE_EXTENSION;
                     fileReadWriteService.savePexelImage(pexelImageData);
-                    var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
-                    fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
-                    file = new File(pathToFile);
                     imagesCreated = true;
+                    file = new File(pathToFile);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (InterruptedException e) {
@@ -148,7 +159,6 @@ public class CommandListener extends ListenerAdapter {
                     throw new RuntimeException(e);
                 }
                 event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
-
                 break;
 
             case IMAGE_SEARCH_COMMAND:
@@ -170,6 +180,54 @@ public class CommandListener extends ListenerAdapter {
                     throw new RuntimeException(e);
                 }
                 event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
+                break;
+
+            case CURATED_INSPIRATION_COMMAND:
+                event.reply("Creating something inspirational...").queue();
+                try {
+                    var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
+                    var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhoto();
+                    var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+                    timestamp = pexelImageData.getTimestamp();
+                    var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
+                    fileReadWriteService.savePexelImage(pexelImageData);
+                    var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
+                    fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
+                    file = new File(pathToFile);
+                    imagesCreated = true;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
+
+                break;
+
+            case RANDOM_INSPIRATION_COMMAND:
+                event.reply("Creating something random and inspirational...").queue();
+                try {
+                    var zenQuoteResponse = zenQuoteRetrievalService.getRandomQuote();
+                    var pexelImage = pexelsImageRetrievalService.retrieveRandomPhoto();
+                    var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
+                    timestamp = pexelImageData.getTimestamp();
+                    var pathToFile = FILE_BASE_PATH + timestamp + "-modified" + JPEG_FILE_EXTENSION;
+                    fileReadWriteService.savePexelImage(pexelImageData);
+                    var modifiedImage = imageModifierService.addTextToImage(timestamp, zenQuoteResponse);
+                    fileReadWriteService.saveBufferedImage(timestamp, modifiedImage);
+                    file = new File(pathToFile);
+                    imagesCreated = true;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+                event.getChannel().sendMessage("").addFiles(FileUpload.fromData(file)).queue();
+
                 break;
 
             case INSPIRATIONAL_IMAGE_SEARCH_COMMAND:

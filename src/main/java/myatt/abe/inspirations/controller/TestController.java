@@ -42,7 +42,7 @@ public class TestController {
 
     @GetMapping("/pexels-curated")
     public ResponseEntity<String> getPexelsCuratedImage() throws URISyntaxException, IOException, InterruptedException {
-        var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+        var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhoto();
 
         var imageBytes = pexelsImageRetrievalService.downloadImage(pexelImage);
 
@@ -66,7 +66,7 @@ public class TestController {
     public ResponseEntity<String> addTextToImageCurated() throws IOException, URISyntaxException, InterruptedException {
         var zenQuote = zenQuoteRetrievalService.getRandomQuote();
 
-        var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhotos();
+        var pexelImage = pexelsImageRetrievalService.retrieveCuratedPhoto();
 
         var pexelImageData = pexelsImageRetrievalService.downloadImage(pexelImage);
 
